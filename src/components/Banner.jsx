@@ -44,8 +44,8 @@ const Banner = () => {
         autoPlay
         infiniteLoop
         showStatus={false}
-        interval={6000}
-        transitionTime={1200}
+        interval={5000}
+        transitionTime={900}
         swipeable
         emulateTouch
         showArrows={true}
@@ -54,7 +54,7 @@ const Banner = () => {
             <button
               onClick={onClickHandler}
               title={label}
-              className="absolute top-1/2 left-4 -translate-y-1/2 z-20 p-3 bg-indigo-700 bg-opacity-60 rounded-full text-white hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="absolute top-1/2 left-6 -translate-y-1/2 z-20 p-3 bg-black/40 hover:bg-black/60 rounded-full text-white shadow-md transition-all"
               aria-label="Previous Slide"
             >
               &#8592;
@@ -66,7 +66,7 @@ const Banner = () => {
             <button
               onClick={onClickHandler}
               title={label}
-              className="absolute top-1/2 right-4 -translate-y-1/2 z-20 p-3 bg-indigo-700 bg-opacity-60 rounded-full text-white hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              className="absolute top-1/2 right-6 -translate-y-1/2 z-20 p-3 bg-black/40 hover:bg-black/60 rounded-full text-white shadow-md transition-all"
               aria-label="Next Slide"
             >
               &#8594;
@@ -77,10 +77,10 @@ const Banner = () => {
           <button
             type="button"
             onClick={onClickHandler}
-            className={`w-4 h-4 rounded-full mx-1 focus:outline-none ${
+            className={`w-3 h-3 rounded-full mx-1 transition-all ${
               isSelected
-                ? 'bg-indigo-600 shadow-lg'
-                : 'bg-indigo-300 hover:bg-indigo-500'
+                ? 'bg-indigo-600 scale-110 shadow-lg'
+                : 'bg-white/50 hover:bg-white'
             }`}
             aria-label={`${label} ${index + 1}`}
             aria-current={isSelected ? 'true' : 'false'}
@@ -89,30 +89,23 @@ const Banner = () => {
         )}
       >
         {bannerData.map(({ id, title, description, image }) => (
-          <div key={id} className="relative">
+          <div key={id} className="relative group">
             <img
               src={image}
               alt={title}
-              className="h-[450px] md:h-[600px] w-full object-cover brightness-90 transition duration-700 ease-in-out"
+              className="h-[450px] md:h-[600px] w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-700 ease-in-out"
             />
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent"></div>
-
-            {/* Content */}
-            <div className="absolute top-1/2 left-12 transform -translate-y-1/2 max-w-xl text-left">
-              <h2
-                className="text-4xl md:text-6xl font-extrabold text-white leading-tight drop-shadow-lg"
-                style={{ letterSpacing: '0.03em' }}
-              >
+            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent backdrop-blur-[1px]" />
+            <div className="absolute top-1/2 left-6 md:left-12 transform -translate-y-1/2 max-w-lg text-left animate-fadeInUp">
+              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
                 {title}
               </h2>
-              <p className="mt-4 text-lg md:text-xl text-gray-300 max-w-lg leading-relaxed drop-shadow-md">
+              <p className="mt-3 md:mt-5 text-base md:text-lg text-gray-200 max-w-md leading-relaxed drop-shadow-md">
                 {description}
               </p>
               <Link
                 to="/register"
-                className="mt-8 inline-block px-8 py-3 bg-indigo-600 hover:bg-indigo-700 focus:ring-4 focus:ring-indigo-500 text-white font-semibold rounded-lg shadow-lg transition transform hover:-translate-y-1 focus:outline-none"
-                aria-label="Get Started with EduBridge"
+                className="mt-6 inline-block px-7 py-3 bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl focus:ring-4 focus:ring-indigo-500 text-white font-medium rounded-full shadow-md transition-all duration-300"
               >
                 Get Started
               </Link>
