@@ -2,6 +2,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination, Autoplay } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import { FaQuoteLeft } from 'react-icons/fa';
 
 const testimonials = [
   {
@@ -38,13 +39,19 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-blue-50 to-blue-100">
-      <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-4xl font-extrabold mb-4 text-gray-800">
-          What Our <span className="text-blue-600">Learners</span> Say
+    <section className="py-20 px-4 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 relative overflow-hidden">
+      {/* Background Accent Shapes */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-20 left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="max-w-7xl mx-auto text-center relative z-10">
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-700 to-indigo-500 bg-clip-text text-transparent">
+          What Our <span className="text-blue-700">Learners</span> Say
         </h2>
-        <p className="mb-12 text-gray-600 text-lg max-w-2xl mx-auto">
-          Hear directly from our global community about how Language Exchange has helped them achieve their goals.
+        <p className="mb-12 text-gray-700 text-lg max-w-2xl mx-auto">
+          Hear directly from our global community about how <strong>Language Exchange</strong> has helped them achieve their goals.
         </p>
 
         <Swiper
@@ -58,24 +65,25 @@ const Testimonials = () => {
             1024: { slidesPerView: 3 },
           }}
           modules={[Pagination, Autoplay]}
-          className="pb-20"
+          className="pb-16"
         >
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
-              <div className="bg-white/60 backdrop-blur-xl border border-blue-100 p-6 rounded-3xl shadow-xl hover:scale-105 hover:shadow-2xl transition-transform duration-300 h-full py-12">
-                <div className="flex items-center gap-4 mb-5">
+              <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full">
+                <div className="flex items-center gap-5 mb-6">
                   <img
                     src={t.img}
                     alt={t.name}
-                    className="w-14 h-14 rounded-full object-cover ring-2 ring-blue-500"
+                    className="w-16 h-16 rounded-full object-cover ring-4 ring-blue-500/50 hover:ring-blue-500 transition-all duration-300"
                   />
-                  <div>
-                    <h4 className="text-xl font-semibold text-gray-800">{t.name}</h4>
-                    <span className="text-sm text-blue-600">{t.language}</span>
+                  <div className="text-left">
+                    <h4 className="text-lg font-bold text-gray-900">{t.name}</h4>
+                    <span className="text-sm text-blue-600 font-medium">{t.language}</span>
                   </div>
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  "{t.comment}"
+                <p className="text-gray-700 text-sm leading-relaxed relative pl-6">
+                  <FaQuoteLeft className="absolute left-0 top-0 text-blue-500 opacity-60" />
+                  {t.comment}
                 </p>
               </div>
             </SwiperSlide>
