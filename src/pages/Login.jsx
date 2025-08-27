@@ -2,7 +2,12 @@ import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'react-hot-toast';
 import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from 'firebase/auth';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  GoogleAuthProvider,
+  signInWithPopup,
+} from 'firebase/auth';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import lottieLogin from '../assets/lotties/login.json';
 import app from '../firebase/firebase.config';
@@ -17,26 +22,48 @@ const Login = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const from = location.state?.from?.pathname || '/';
-
   const [showPassword, setShowPassword] = useState(false);
 
+  // Email/password login
   const onSubmit = async (data) => {
     try {
-      await signInWithEmailAndPassword(auth, data.email, data.password);
-      toast.success('Login successful!');
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const userEmail = userCredential.user.email;
+
+      // Fetch user from MongoDB
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/users?email=${userEmail}`);
+      const mongoUser = await res.json();
+
+      if (!mongoUser || !mongoUser.email) {
+        toast.error("User not found in database");
+        return;
+      }
+
+      toast.success(`Welcome back, ${mongoUser.name}`);
       navigate(from, { replace: true });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Login failed");
     }
   };
 
+  // Google login
   const handleGoogleLogin = async () => {
     try {
-      await signInWithPopup(auth, provider);
-      toast.success('Google login successful!');
+      const result = await signInWithPopup(auth, provider);
+      const user = result.user;
+
+      // Save or update user in MongoDB
+      const userData = { name: user.displayName, email: user.email, role: "user" };
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
+      toast.success(`Welcome, ${user.displayName}`);
       navigate(from, { replace: true });
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "Google login failed");
     }
   };
 
@@ -60,10 +87,7 @@ const Login = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-7" noValidate>
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Email
             </label>
             <input
@@ -77,19 +101,12 @@ const Login = () => {
                 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               aria-invalid={errors.email ? 'true' : 'false'}
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="mt-1 text-sm text-red-600 select-none">{errors.email.message}</p>}
           </div>
 
           {/* Password */}
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Password
             </label>
             <div className="relative">
@@ -109,26 +126,20 @@ const Login = () => {
               />
               <button
                 type="button"
-                onClick={() => setShowPassword((prev) => !prev)}
+                onClick={() => setShowPassword(prev => !prev)}
                 className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-400 hover:text-lime-600 dark:hover:text-lime-400 transition focus:outline-none"
                 aria-label={showPassword ? 'Hide password' : 'Show password'}
               >
                 {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
               </button>
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.password.message}
-              </p>
-            )}
+            {errors.password && <p className="mt-1 text-sm text-red-600 select-none">{errors.password.message}</p>}
           </div>
 
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full py-3 bg-lime-600 hover:bg-lime-700 active:bg-lime-800
-              text-white font-semibold rounded-full shadow-lg
-              focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
+            className="w-full py-3 bg-lime-600 hover:bg-lime-700 active:bg-lime-800 text-white font-semibold rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
           >
             Login
           </button>
@@ -141,12 +152,10 @@ const Login = () => {
           <hr className="flex-grow border-gray-300 dark:border-gray-700" />
         </div>
 
-        {/* Google Login Button */}
+        {/* Google Login */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex justify-center items-center gap-4 py-3 border border-lime-600
-            rounded-full font-semibold text-lime-700 hover:bg-lime-600 hover:text-white shadow-md
-            focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
+          className="w-full flex justify-center items-center gap-4 py-3 border border-lime-600 rounded-full font-semibold text-lime-700 hover:bg-lime-600 hover:text-white shadow-md focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
           aria-label="Sign in with Google"
         >
           <FaGoogle size={22} />

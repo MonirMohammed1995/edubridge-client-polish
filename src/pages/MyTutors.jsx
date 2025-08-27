@@ -2,29 +2,33 @@ import React, { useContext, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { AuthContext } from '../context/AuthProvider';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaShoppingCart } from 'react-icons/fa';
 import { Helmet } from 'react-helmet';
+import Loader from '../components/Loader';
 
 const MyTutorials = () => {
   const { user } = useContext(AuthContext);
   const [tutorials, setTutorials] = useState([]);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Fetch user's tutorials
   useEffect(() => {
     const fetchTutorials = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/tutors?email=${user.email}`
-        );
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/tutors?email=${user.email}`);
         const data = await res.json();
         setTutorials(data);
       } catch {
         Swal.fire('❌ Error', 'Failed to fetch tutorials', 'error');
+      } finally {
+        setLoading(false);
       }
     };
     if (user?.email) fetchTutorials();
   }, [user]);
 
+  // Delete tutorial
   const handleDelete = async (id) => {
     const confirm = await Swal.fire({
       title: 'Delete Tutorial?',
@@ -34,15 +38,11 @@ const MyTutorials = () => {
       confirmButtonColor: '#dc2626',
       cancelButtonColor: '#6b7280',
       confirmButtonText: 'Yes, delete it!',
-      cancelButtonText: 'Cancel',
-      reverseButtons: true,
     });
 
     if (confirm.isConfirmed) {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/tutors/${id}`, {
-          method: 'DELETE',
-        });
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/tutors/${id}`, { method: 'DELETE' });
         if (res.ok) {
           setTutorials((prev) => prev.filter((t) => t._id !== id));
           Swal.fire('✅ Deleted!', 'Tutorial deleted successfully.', 'success');
@@ -54,6 +54,39 @@ const MyTutorials = () => {
       }
     }
   };
+
+  // Book tutorial
+  const handleBook = (tutorial) => {
+    if (!user) {
+      Swal.fire('⚠️ Please login first!', '', 'warning');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Book this Tutor?',
+      text: `Do you want to book ${tutorial.tutorName}?`,
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#2563eb',
+      cancelButtonColor: '#6b7280',
+      confirmButtonText: 'Yes, Book!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        navigate(`/bookings/${tutorial._id}`); // You can replace with direct API call if you want instant booking
+      }
+    });
+  };
+
+  if (loading) {
+    return (
+      <div className="flex flex-col items-center justify-center py-28">
+        <Loader />
+        <p className="mt-6 text-indigo-600 font-semibold text-lg tracking-wide">
+          Loading your tutorials...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12">
@@ -75,7 +108,7 @@ const MyTutorials = () => {
                 <th className="p-5">Language</th>
                 <th className="p-5">Price</th>
                 <th className="p-5 max-w-xs">Description</th>
-                <th className="p-5">Review</th>
+                <th className="p-5 text-center">Review</th>
                 <th className="p-5 text-center">Actions</th>
               </tr>
             </thead>
@@ -84,9 +117,7 @@ const MyTutorials = () => {
                 <tr
                   key={tutorial._id}
                   className={`transition-colors duration-300 ${
-                    idx % 2 === 0
-                      ? 'bg-gray-50 dark:bg-gray-800'
-                      : 'bg-white dark:bg-gray-900'
+                    idx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-800' : 'bg-white dark:bg-gray-900'
                   } hover:bg-indigo-100 dark:hover:bg-indigo-900 cursor-pointer`}
                   title="Click a cell to select"
                 >
@@ -98,20 +129,14 @@ const MyTutorials = () => {
                       loading="lazy"
                     />
                   </td>
-                  <td className="p-5 font-semibold text-gray-900 dark:text-gray-100">
-                    {tutorial.tutorName}
-                  </td>
+                  <td className="p-5 font-semibold text-gray-900 dark:text-gray-100">{tutorial.tutorName}</td>
                   <td className="p-5">{tutorial.language}</td>
                   <td className="p-5 font-medium">${tutorial.price.toFixed(2)}</td>
-                  <td
-                    className="p-5 max-w-xs truncate"
-                    title={tutorial.description}
-                    style={{ maxWidth: 280 }}
-                  >
+                  <td className="p-5 max-w-xs truncate" title={tutorial.description} style={{ maxWidth: 280 }}>
                     {tutorial.description}
                   </td>
                   <td className="p-5 text-center">{tutorial.review ?? 'N/A'}</td>
-                  <td className="p-5 flex justify-center gap-3">
+                  <td className="p-5 flex justify-center gap-3 flex-wrap">
                     <button
                       onClick={() => navigate(`/update-tutor/${tutorial._id}`)}
                       className="p-3 bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-yellow-400"
@@ -125,6 +150,13 @@ const MyTutorials = () => {
                       aria-label="Delete Tutorial"
                     >
                       <FaTrash size={18} />
+                    </button>
+                    <button
+                      onClick={() => handleBook(tutorial)}
+                      className="p-3 bg-indigo-700 hover:bg-indigo-800 text-white rounded-xl shadow-md hover:shadow-lg transition-transform transform hover:scale-110 focus:outline-none focus:ring-4 focus:ring-indigo-500 flex items-center gap-2"
+                      aria-label="Book Tutor"
+                    >
+                      <FaShoppingCart size={16} /> Book
                     </button>
                   </td>
                 </tr>
@@ -144,7 +176,7 @@ const MyTutorials = () => {
             No tutorials found
           </h3>
           <p className="max-w-lg text-gray-500 dark:text-gray-400 mb-8 leading-relaxed">
-            You haven’t added any tutorials yet. Start by adding your first tutorial to showcase your expertise!
+            You haven't added any tutorials yet. Start by adding your first tutorial to showcase your expertise!
           </p>
           <button
             onClick={() => navigate('/add-tutor')}

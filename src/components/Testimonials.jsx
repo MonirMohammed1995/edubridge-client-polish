@@ -39,18 +39,18 @@ const testimonials = [
 
 const Testimonials = () => {
   return (
-    <section className="py-20 px-4 bg-gradient-to-br from-blue-50 via-blue-100 to-blue-200 relative overflow-hidden">
+    <section className="py-20 px-4 bg-gradient-to-br from-gray-50 via-white to-gray-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 relative overflow-hidden transition-colors duration-500">
       {/* Background Accent Shapes */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute bottom-10 right-10 w-48 h-48 bg-indigo-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute top-20 left-10 w-40 h-40 bg-blue-400/20 dark:bg-blue-600/20 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-indigo-400/20 dark:bg-indigo-600/20 rounded-full blur-3xl"></div>
       </div>
 
       <div className="max-w-7xl mx-auto text-center relative z-10">
         <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-gradient-to-r from-blue-700 to-indigo-500 bg-clip-text text-transparent">
-          What Our <span className="text-blue-700">Learners</span> Say
+          What Our <span className="text-blue-700 dark:text-blue-400">Learners</span> Say
         </h2>
-        <p className="mb-12 text-gray-700 text-lg max-w-2xl mx-auto">
+        <p className="mb-12 text-gray-700 dark:text-gray-300 text-lg max-w-2xl mx-auto">
           Hear directly from our global community about how <strong>Language Exchange</strong> has helped them achieve their goals.
         </p>
 
@@ -69,20 +69,20 @@ const Testimonials = () => {
         >
           {testimonials.map((t, i) => (
             <SwiperSlide key={i}>
-              <div className="bg-white/60 backdrop-blur-xl border border-white/40 p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full">
+              <div className="bg-white/70 dark:bg-gray-900/70 backdrop-blur-xl border border-white/30 dark:border-gray-700 p-8 rounded-3xl shadow-xl hover:shadow-2xl hover:-translate-y-2 transition-all duration-300 h-full flex flex-col justify-between">
                 <div className="flex items-center gap-5 mb-6">
                   <img
                     src={t.img}
                     alt={t.name}
-                    className="w-16 h-16 rounded-full object-cover ring-4 ring-blue-500/50 hover:ring-blue-500 transition-all duration-300"
+                    className="w-16 h-16 rounded-full object-cover ring-4 ring-blue-500/50 dark:ring-blue-400/50 hover:ring-blue-500 dark:hover:ring-blue-400 transition-all duration-300"
                   />
                   <div className="text-left">
-                    <h4 className="text-lg font-bold text-gray-900">{t.name}</h4>
-                    <span className="text-sm text-blue-600 font-medium">{t.language}</span>
+                    <h4 className="text-lg font-bold text-gray-900 dark:text-white">{t.name}</h4>
+                    <span className="text-sm text-blue-600 dark:text-blue-400 font-medium">{t.language}</span>
                   </div>
                 </div>
-                <p className="text-gray-700 text-sm leading-relaxed relative pl-6">
-                  <FaQuoteLeft className="absolute left-0 top-0 text-blue-500 opacity-60" />
+                <p className="text-gray-700 dark:text-gray-300 text-sm leading-relaxed relative pl-6 flex-1">
+                  <FaQuoteLeft className="absolute left-0 top-0 text-blue-500 dark:text-blue-400 opacity-60" />
                   {t.comment}
                 </p>
               </div>

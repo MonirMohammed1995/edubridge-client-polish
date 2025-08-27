@@ -18,6 +18,9 @@ import Lottie from "lottie-react";
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
+// Replace this with your backend API base URL
+const VITE_API_URL = "http://localhost:3000"; // Or your deployed backend
+
 const Register = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -43,15 +46,29 @@ const Register = () => {
     }
 
     try {
+      // 1️⃣ Create Firebase user
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       await updateProfile(userCredential.user, {
         displayName: name,
         photoURL: photo,
       });
 
-      toast.success("Registration successful!");
-      reset();
-      navigate("/");
+      // 2️⃣ Store user in MongoDB
+      const user = { name, email, role: "user" };
+      const res = await fetch(`${VITE_API_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(user),
+      });
+      const dataRes = await res.json();
+
+      if (dataRes.success) {
+        toast.success("Registration successful!");
+        reset();
+        navigate("/");
+      } else {
+        toast.error(dataRes.message || "Failed to save user in database");
+      }
     } catch (err) {
       toast.error(err.message || "Registration failed");
     }
@@ -61,6 +78,15 @@ const Register = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
+
+      // 1️⃣ Save Google user in MongoDB
+      const userData = { name: user.displayName, email: user.email, role: "user" };
+      await fetch(`${BACKEND_URL}/users`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(userData),
+      });
+
       toast.success(`Welcome, ${user.displayName}`);
       navigate("/");
     } catch (error) {
@@ -88,10 +114,7 @@ const Register = () => {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8" noValidate>
           {/* Name */}
           <div>
-            <label
-              htmlFor="name"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="name" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Name
             </label>
             <input
@@ -99,25 +122,15 @@ const Register = () => {
               type="text"
               {...register("name", { required: "Name is required" })}
               placeholder="Your full name"
-              className={`w-full px-5 py-3 rounded-lg border
-                focus:outline-none focus:ring-3 focus:ring-lime-500
-                transition duration-300 text-gray-900 dark:text-gray-100
-                ${errors.name ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
+              className={`w-full px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500 transition duration-300 text-gray-900 dark:text-gray-100 ${errors.name ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
               aria-invalid={errors.name ? "true" : "false"}
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.name.message}
-              </p>
-            )}
+            {errors.name && <p className="mt-1 text-sm text-red-600 select-none">{errors.name.message}</p>}
           </div>
 
           {/* Email */}
           <div>
-            <label
-              htmlFor="email"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="email" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Email
             </label>
             <input
@@ -125,25 +138,15 @@ const Register = () => {
               type="email"
               {...register("email", { required: "Email is required" })}
               placeholder="you@example.com"
-              className={`w-full px-5 py-3 rounded-lg border
-                focus:outline-none focus:ring-3 focus:ring-lime-500
-                transition duration-300 text-gray-900 dark:text-gray-100
-                ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
+              className={`w-full px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500 transition duration-300 text-gray-900 dark:text-gray-100 ${errors.email ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
               aria-invalid={errors.email ? "true" : "false"}
             />
-            {errors.email && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.email.message}
-              </p>
-            )}
+            {errors.email && <p className="mt-1 text-sm text-red-600 select-none">{errors.email.message}</p>}
           </div>
 
           {/* Photo URL */}
           <div>
-            <label
-              htmlFor="photo"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="photo" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Photo URL
             </label>
             <input
@@ -151,25 +154,15 @@ const Register = () => {
               type="url"
               {...register("photo", { required: "Photo URL is required" })}
               placeholder="https://your-photo-url.com"
-              className={`w-full px-5 py-3 rounded-lg border
-                focus:outline-none focus:ring-3 focus:ring-lime-500
-                transition duration-300 text-gray-900 dark:text-gray-100
-                ${errors.photo ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
+              className={`w-full px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500 transition duration-300 text-gray-900 dark:text-gray-100 ${errors.photo ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
               aria-invalid={errors.photo ? "true" : "false"}
             />
-            {errors.photo && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.photo.message}
-              </p>
-            )}
+            {errors.photo && <p className="mt-1 text-sm text-red-600 select-none">{errors.photo.message}</p>}
           </div>
 
           {/* Password with toggle */}
           <div>
-            <label
-              htmlFor="password"
-              className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none"
-            >
+            <label htmlFor="password" className="block mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300 select-none">
               Password
             </label>
             <div className="relative">
@@ -178,10 +171,7 @@ const Register = () => {
                 type={showPassword ? "text" : "password"}
                 {...register("password", { required: "Password is required" })}
                 placeholder="••••••••"
-                className={`w-full pr-12 px-5 py-3 rounded-lg border
-                  focus:outline-none focus:ring-3 focus:ring-lime-500
-                  transition duration-300 text-gray-900 dark:text-gray-100
-                  ${errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
+                className={`w-full pr-12 px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500 transition duration-300 text-gray-900 dark:text-gray-100 ${errors.password ? "border-red-500 focus:ring-red-500" : "border-gray-300 dark:border-gray-600"}`}
                 aria-invalid={errors.password ? "true" : "false"}
               />
               <button
@@ -193,19 +183,13 @@ const Register = () => {
                 {showPassword ? <FaEyeSlash size={20} /> : <FaEye size={20} />}
               </button>
             </div>
-            {errors.password && (
-              <p className="mt-1 text-sm text-red-600 select-none" role="alert">
-                {errors.password.message}
-              </p>
-            )}
+            {errors.password && <p className="mt-1 text-sm text-red-600 select-none">{errors.password.message}</p>}
           </div>
 
           {/* Submit */}
           <button
             type="submit"
-            className="w-full py-3 bg-lime-600 hover:bg-lime-700 active:bg-lime-800
-              text-white font-semibold rounded-full shadow-lg
-              focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
+            className="w-full py-3 bg-lime-600 hover:bg-lime-700 active:bg-lime-800 text-white font-semibold rounded-full shadow-lg focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
           >
             Register
           </button>
@@ -221,9 +205,7 @@ const Register = () => {
         {/* Google Signup */}
         <button
           onClick={handleGoogleSignUp}
-          className="w-full flex justify-center items-center gap-4 py-3 border border-lime-600
-            rounded-full font-semibold text-lime-700 hover:bg-lime-600 hover:text-white shadow-md
-            focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
+          className="w-full flex justify-center items-center gap-4 py-3 border border-lime-600 rounded-full font-semibold text-lime-700 hover:bg-lime-600 hover:text-white shadow-md focus:outline-none focus:ring-4 focus:ring-lime-500 transition duration-300"
           aria-label="Continue with Google"
         >
           <FaGoogle size={22} />

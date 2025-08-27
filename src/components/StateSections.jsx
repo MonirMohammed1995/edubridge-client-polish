@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import CountUp from 'react-countup';
 import { useInView } from 'react-intersection-observer';
-import {
-  Users,
-  Star,
-  Languages,
-  UserRound
-} from 'lucide-react';
+import { Users, Star, Languages, UserRound } from 'lucide-react';
 
+// Icons with color codes
 const iconMap = {
   totalTutors: <Users size={40} className="text-indigo-600" aria-hidden="true" />,
   totalReviews: <Star size={40} className="text-yellow-500" aria-hidden="true" />,
@@ -16,15 +12,10 @@ const iconMap = {
 };
 
 const StatsSection = () => {
-  const [ref, inView] = useInView({
-    triggerOnce: true,
-    threshold: 0.4,
-  });
-
+  const [ref, inView] = useInView({ triggerOnce: true, threshold: 0.4 });
   const [stats, setStats] = useState(null);
   const [error, setError] = useState(null);
 
-  // Fetch stats from server on component mount
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -32,12 +23,11 @@ const StatsSection = () => {
         if (!res.ok) throw new Error(`Failed to fetch stats: ${res.status}`);
         const data = await res.json();
 
-        // Map server response to stats array for UI
         setStats([
-          { id: 1, title: 'Total Tutors', count: data.totalTutors, icon: iconMap.totalTutors },
-          { id: 2, title: 'Total Reviews', count: data.totalBookings, icon: iconMap.totalReviews }, // Adjusted to totalBookings assuming reviews == bookings
-          { id: 3, title: 'Languages Taught', count: data.languagesTaught || 14, icon: iconMap.languagesTaught }, // fallback 14
-          { id: 4, title: 'Registered Users', count: data.registeredUsers || 980, icon: iconMap.registeredUsers }, // fallback 980
+          { id: 1, title: 'Total Tutors', count: data.totalTutors || 0, icon: iconMap.totalTutors },
+          { id: 2, title: 'Total Reviews', count: data.totalBookings || 0, icon: iconMap.totalReviews },
+          { id: 3, title: 'Languages Taught', count: data.languagesTaught || 14, icon: iconMap.languagesTaught },
+          { id: 4, title: 'Registered Users', count: data.registeredUsers || 980, icon: iconMap.registeredUsers },
         ]);
       } catch (err) {
         setError(err.message);
@@ -49,14 +39,14 @@ const StatsSection = () => {
   return (
     <section
       ref={ref}
-      className="bg-gradient-to-b from-white to-gray-100 dark:from-gray-900 dark:to-gray-800 py-24 px-6 sm:px-12 lg:px-20 transition-colors duration-500"
+      className="bg-gradient-to-b from-white to-gray-100 dark:from-gray-950 dark:to-gray-900 py-24 px-6 sm:px-12 lg:px-20 transition-colors duration-500"
       aria-label="Platform statistics"
     >
       <div className="max-w-7xl mx-auto text-center">
-        <h2 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight select-none">
+        <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900 dark:text-white mb-3 tracking-tight select-none">
           Our Impact in Numbers
         </h2>
-        <p className="text-lg text-gray-600 dark:text-gray-300 mb-16 max-w-3xl mx-auto select-none">
+        <p className="text-lg md:text-xl text-gray-600 dark:text-gray-300 mb-16 max-w-3xl mx-auto select-none">
           Trusted by a growing global community of learners and educators.
         </p>
 
@@ -70,21 +60,19 @@ const StatsSection = () => {
               <article
                 key={id}
                 className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-3xl shadow-lg
-                           hover:shadow-2xl transition-shadow duration-300 p-10 flex flex-col items-center justify-center"
+                           hover:shadow-2xl transform hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300 p-10 flex flex-col items-center justify-center focus:outline-none focus-visible:ring-4 focus-visible:ring-indigo-500"
                 role="region"
                 aria-labelledby={`stat-title-${id}`}
                 tabIndex={0}
               >
-                <div className="mb-6">
-                  {icon}
-                </div>
+                <div className="mb-6">{icon}</div>
                 <h3
                   id={`stat-title-${id}`}
-                  className="text-5xl font-extrabold text-gray-900 dark:text-white leading-none select-text"
+                  className="text-5xl md:text-6xl font-extrabold text-gray-900 dark:text-white leading-none select-text"
                 >
                   {inView ? <CountUp end={count} duration={2.5} separator="," /> : '0'}
                 </h3>
-                <p className="mt-3 text-base font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide select-none">
+                <p className="mt-3 text-base md:text-lg font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide select-none">
                   {title}
                 </p>
               </article>
