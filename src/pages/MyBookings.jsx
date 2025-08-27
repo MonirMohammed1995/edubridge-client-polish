@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthProvider";
 import Swal from "sweetalert2";
+import { motion } from "framer-motion";
 
 const MyBookings = () => {
   const { user } = useContext(AuthContext);
@@ -10,70 +11,50 @@ const MyBookings = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const res = await fetch(
-          `${import.meta.env.VITE_API_URL}/bookings/${user?.email}`
-        );
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/${user?.email}`);
         const data = await res.json();
 
-        if (res.ok) {
-          setBookings(data);
-        } else {
-          console.error("Error fetching bookings:", data?.error);
-          setBookings([]);
-        }
+        if (res.ok) setBookings(data);
+        else setBookings([]);
       } catch (error) {
         console.error("Error fetching bookings:", error);
       }
     };
-
     if (user?.email) fetchBookings();
   }, [user]);
 
-  // Handle review (only 1 API call now ✅)
   const handleReview = async (bookingId) => {
     try {
-      const res = await fetch(
-        `${import.meta.env.VITE_API_URL}/bookings/reviewed/${bookingId}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-        }
-      );
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/bookings/reviewed/${bookingId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+      });
 
       const data = await res.json();
 
       if (res.ok && data.success) {
         Swal.fire("✅ Review submitted!", "", "success");
-
-        // Update local state
-        const updated = bookings.map((b) =>
-          b._id === bookingId ? { ...b, reviewed: true } : b
-        );
-        setBookings(updated);
+        setBookings(bookings.map((b) => (b._id === bookingId ? { ...b, reviewed: true } : b)));
       } else {
-        Swal.fire(
-          "❌ Failed to submit review",
-          data?.error || "Something went wrong",
-          "error"
-        );
+        Swal.fire("❌ Failed to submit review", data?.error || "Something went wrong", "error");
       }
-    } catch (err) {
+    } catch {
       Swal.fire("❌ Error", "Something went wrong", "error");
     }
   };
 
   return (
     <main className="max-w-7xl mx-auto px-6 py-12">
-      <h1 className="text-4xl font-extrabold text-center text-indigo-700 mb-14 tracking-tight">
+      <h1 className="text-4xl md:text-5xl font-extrabold text-center text-indigo-700 dark:text-indigo-300 mb-14 tracking-tight select-none">
         My Bookings
       </h1>
 
       {bookings.length === 0 ? (
         <section className="text-center mt-32">
-          <h2 className="text-2xl font-semibold text-gray-700 dark:text-gray-300">
+          <h2 className="text-2xl md:text-3xl font-semibold text-gray-700 dark:text-gray-300">
             You haven't booked any tutors yet.
           </h2>
-          <p className="mt-3 text-gray-500">
+          <p className="mt-3 text-gray-500 dark:text-gray-400 text-base md:text-lg">
             Explore tutors and book your first lesson today!
           </p>
         </section>
@@ -83,25 +64,25 @@ const MyBookings = () => {
           className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10"
         >
           {bookings.map((booking) => (
-            <article
+            <motion.article
               key={booking._id}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
               className="flex flex-col bg-white dark:bg-gray-900/80 rounded-3xl
-                shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden"
+                shadow-lg hover:shadow-2xl transition-shadow duration-300 overflow-hidden border border-gray-200 dark:border-gray-700"
             >
               {/* Tutor Image */}
-              <div className="relative w-full h-52">
+              <div className="relative w-full h-52 md:h-64">
                 <img
-                  src={
-                    booking?.image ||
-                    "https://via.placeholder.com/400x300?text=No+Image"
-                  }
+                  src={booking?.image || "https://via.placeholder.com/400x300?text=No+Image"}
                   alt={`${booking?.language || "Tutor"} image`}
                   loading="lazy"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                 />
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
                   <h3
-                    className="text-xl font-bold text-white truncate"
+                    className="text-xl md:text-2xl font-bold text-white truncate select-text"
                     title={booking?.language || "Unknown Language"}
                   >
                     {booking?.language || "Unknown Language"}
@@ -111,19 +92,14 @@ const MyBookings = () => {
 
               {/* Tutor Details */}
               <div className="flex flex-col flex-grow p-6 space-y-4">
-                <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg">
-                  Price:{" "}
-                  <span className="text-indigo-600">
-                    ${booking?.price || "N/A"}
-                  </span>
+                <p className="text-gray-700 dark:text-gray-300 font-semibold text-lg md:text-xl">
+                  Price: <span className="text-indigo-600 dark:text-indigo-400">${booking?.price || "N/A"}</span>
                 </p>
 
-                <p className="text-gray-600 dark:text-gray-400 text-sm">
+                <p className="text-gray-600 dark:text-gray-400 text-sm md:text-base">
                   Booked On:{" "}
                   <span className="font-medium">
-                    {booking?.bookedAt
-                      ? new Date(booking.bookedAt).toLocaleDateString()
-                      : "Unknown"}
+                    {booking?.bookedAt ? new Date(booking.bookedAt).toLocaleDateString() : "Unknown"}
                   </span>
                 </p>
 
@@ -142,7 +118,7 @@ const MyBookings = () => {
                   {booking?.reviewed ? "✅ Reviewed" : "📝 Leave Review"}
                 </button>
               </div>
-            </article>
+            </motion.article>
           ))}
         </section>
       )}

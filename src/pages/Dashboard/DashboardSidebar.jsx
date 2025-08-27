@@ -10,7 +10,7 @@ const auth = getAuth(app);
 
 const DashboardSidebar = () => {
   const navigate = useNavigate();
-  const { user, role } = useContext(AuthContext); // ধরে নিচ্ছি AuthContext এ role আছে
+  const { user, role } = useContext(AuthContext);
 
   const handleLogout = () => {
     signOut(auth)
@@ -21,7 +21,6 @@ const DashboardSidebar = () => {
       .catch((error) => toast.error(`Logout failed: ${error.message}`));
   };
 
-  // user menu
   const userMenu = [
     { name: "Home", path: "/", icon: <Home size={18} /> },
     { name: "Overview", path: "/dashboard/user/overview", icon: <Home size={18} /> },
@@ -29,7 +28,6 @@ const DashboardSidebar = () => {
     { name: "My Booked Tutors", path: "/dashboard/user/my-booked", icon: <Bookmark size={18} /> },
   ];
 
-  // admin menu
   const adminMenu = [
     { name: "Home", path: "/", icon: <Home size={18} /> },
     { name: "Dashboard Overview", path: "/dashboard/admin/overview", icon: <Home size={18} /> },
@@ -42,44 +40,47 @@ const DashboardSidebar = () => {
   const menuItems = role === "admin" ? adminMenu : userMenu;
 
   return (
-    <div className="w-64 h-screen bg-gray-900 text-white fixed top-0 left-0 shadow-lg flex flex-col">
-      <div className="px-6 py-4 text-2xl font-bold border-b border-gray-700">
-        Dashboard
+    <aside className="w-64 h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 fixed top-0 left-0 shadow-lg border-r border-gray-200 dark:border-gray-700 flex flex-col transition-colors duration-300">
+      {/* Logo / Title */}
+      <div className="px-6 py-5 text-2xl font-bold border-b border-gray-300 dark:border-gray-700 select-none">
+        EduBridge
       </div>
 
-      <nav className="mt-4 flex-1">
+      {/* Menu */}
+      <nav className="mt-6 flex-1 overflow-y-auto">
         <ul className="space-y-1">
           {menuItems.map((item, idx) => (
             <li key={idx}>
               <NavLink
                 to={item.path}
                 className={({ isActive }) =>
-                  `flex items-center gap-3 px-5 py-3 hover:bg-gray-800 transition-all duration-200 ${
-                    isActive ? "bg-gray-800 border-l-4 border-blue-500" : ""
+                  `flex items-center gap-3 px-5 py-3 rounded-lg transition-all duration-200 hover:bg-indigo-100 dark:hover:bg-indigo-800 ${
+                    isActive ? "bg-indigo-200 dark:bg-indigo-700 font-semibold shadow-md" : ""
                   }`
                 }
                 end
               >
-                {item.icon}
-                <span>{item.name}</span>
+                <span className="text-indigo-600 dark:text-indigo-300">{item.icon}</span>
+                <span className="truncate">{item.name}</span>
               </NavLink>
             </li>
           ))}
         </ul>
       </nav>
 
-      <div className="border-t border-gray-700 p-4">
+      {/* Logout */}
+      <div className="border-t border-gray-300 dark:border-gray-700 p-4">
         {user && (
           <button
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md transition"
+            className="flex items-center gap-3 w-full px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-medium transition shadow-md"
           >
             <LogOut size={18} />
             Logout
           </button>
         )}
       </div>
-    </div>
+    </aside>
   );
 };
 

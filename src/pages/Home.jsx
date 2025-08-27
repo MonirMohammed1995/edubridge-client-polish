@@ -18,7 +18,7 @@ const sectionVariants = {
 
 const Home = () => {
     return (
-        <div className='max-w-[1380px] mx-auto'>
+        <div>
             <Helmet>
                 <title>Home | Language Exchange</title>
             </Helmet>

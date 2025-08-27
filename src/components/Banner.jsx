@@ -2,6 +2,7 @@ import React from 'react';
 import { Carousel } from 'react-responsive-carousel';
 import { Link } from 'react-router-dom';
 import 'react-responsive-carousel/lib/styles/carousel.min.css';
+import { motion } from 'framer-motion';
 
 const bannerData = [
   {
@@ -54,7 +55,11 @@ const Banner = () => {
             <button
               onClick={onClickHandler}
               title={label}
-              className="absolute top-1/2 left-6 -translate-y-1/2 z-20 p-3 bg-black/40 hover:bg-black/60 rounded-full text-white shadow-md transition-all"
+              className="absolute top-1/2 left-6 -translate-y-1/2 z-20 p-3 
+                         bg-black/40 dark:bg-white/20 
+                         hover:bg-black/60 dark:hover:bg-white/30 
+                         rounded-full text-white dark:text-gray-900 
+                         shadow-md transition-all"
               aria-label="Previous Slide"
             >
               &#8592;
@@ -66,7 +71,11 @@ const Banner = () => {
             <button
               onClick={onClickHandler}
               title={label}
-              className="absolute top-1/2 right-6 -translate-y-1/2 z-20 p-3 bg-black/40 hover:bg-black/60 rounded-full text-white shadow-md transition-all"
+              className="absolute top-1/2 right-6 -translate-y-1/2 z-20 p-3 
+                         bg-black/40 dark:bg-white/20 
+                         hover:bg-black/60 dark:hover:bg-white/30 
+                         rounded-full text-white dark:text-gray-900 
+                         shadow-md transition-all"
               aria-label="Next Slide"
             >
               &#8594;
@@ -80,7 +89,7 @@ const Banner = () => {
             className={`w-3 h-3 rounded-full mx-1 transition-all ${
               isSelected
                 ? 'bg-indigo-600 scale-110 shadow-lg'
-                : 'bg-white/50 hover:bg-white'
+                : 'bg-white/60 dark:bg-gray-600 hover:bg-white dark:hover:bg-gray-400'
             }`}
             aria-label={`${label} ${index + 1}`}
             aria-current={isSelected ? 'true' : 'false'}
@@ -90,25 +99,59 @@ const Banner = () => {
       >
         {bannerData.map(({ id, title, description, image }) => (
           <div key={id} className="relative group">
+            {/* Background Image */}
             <img
               src={image}
               alt={title}
-              className="h-[450px] md:h-[600px] w-full object-cover brightness-90 group-hover:scale-105 transition-transform duration-700 ease-in-out"
+              className="h-[450px] md:h-[600px] w-full object-cover 
+                         brightness-90 dark:brightness-75 
+                         group-hover:scale-105 transition-transform duration-700 ease-in-out"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/40 to-transparent backdrop-blur-[1px]" />
-            <div className="absolute top-1/2 left-6 md:left-12 transform -translate-y-1/2 max-w-lg text-left animate-fadeInUp">
-              <h2 className="text-3xl sm:text-4xl md:text-6xl font-bold text-white leading-tight drop-shadow-lg">
-                {title}
-              </h2>
-              <p className="mt-3 md:mt-5 text-base md:text-lg text-gray-200 max-w-md leading-relaxed drop-shadow-md">
-                {description}
-              </p>
-              <Link
-                to="/register"
-                className="mt-6 inline-block px-7 py-3 bg-indigo-600 hover:bg-indigo-700 hover:shadow-xl focus:ring-4 focus:ring-indigo-500 text-white font-medium rounded-full shadow-md transition-all duration-300"
+            {/* Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r 
+                            from-black/80 via-black/50 to-transparent 
+                            dark:from-gray-900/90 dark:via-gray-900/70 dark:to-transparent 
+                            backdrop-blur-[2px]" />
+            
+            {/* Text Content */}
+            <div className="absolute top-1/2 left-6 md:left-12 transform -translate-y-1/2 max-w-lg text-left">
+              <motion.h2
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="text-3xl sm:text-4xl md:text-6xl font-extrabold 
+                           text-white dark:text-gray-100 
+                           leading-tight drop-shadow-xl"
               >
-                Get Started
-              </Link>
+                {title}
+              </motion.h2>
+              <motion.p
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+                className="mt-3 md:mt-5 text-base md:text-lg 
+                           text-gray-200 dark:text-gray-300 
+                           max-w-md leading-relaxed drop-shadow-md"
+              >
+                {description}
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <Link
+                  to="/register"
+                  className="mt-6 inline-block px-7 py-3 
+                             bg-indigo-600 hover:bg-indigo-700 
+                             focus:ring-4 focus:ring-indigo-400/50 
+                             text-white font-medium rounded-full 
+                             shadow-lg hover:shadow-xl 
+                             transition-all duration-300"
+                >
+                  Get Started
+                </Link>
+              </motion.div>
             </div>
           </div>
         ))}

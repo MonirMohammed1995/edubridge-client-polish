@@ -71,20 +71,20 @@ const Update = () => {
   };
 
   const inputClass =
-    "w-full rounded-md border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm placeholder-gray-400 transition focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500";
+    "w-full rounded-lg border border-gray-300 bg-white px-4 py-3 text-gray-900 shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500";
 
   return (
-    <main className="max-w-4xl mx-auto mt-12 mb-16 px-6 py-8 bg-white dark:bg-gray-900 rounded-3xl shadow-xl">
+    <main className="max-w-4xl mx-auto mt-12 mb-16 px-6 py-10 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl transition-colors duration-300">
       <Helmet>
         <title>Update Tutor - EduBridge</title>
       </Helmet>
 
-      <h1 className="mb-10 text-center text-4xl font-extrabold text-indigo-700 dark:text-indigo-400 tracking-wide">
+      <h1 className="mb-12 text-center text-4xl font-extrabold text-indigo-700 dark:text-indigo-400 tracking-tight">
         Update Tutor Information
       </h1>
 
       <form onSubmit={handleUpdate} className="space-y-8">
-        {/* User Info - read-only */}
+        {/* User Info */}
         <section className="grid gap-6 md:grid-cols-2">
           <div>
             <label className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">Your Name</label>
@@ -166,19 +166,14 @@ const Update = () => {
               value={formData.language}
               onChange={handleChange}
               required
-              className={inputClass + " cursor-pointer"}
+              className={`${inputClass} cursor-pointer`}
             >
-              <option value="" disabled>
-                Select a language
-              </option>
-              {languages.map((lang) => (
-                <option key={lang} value={lang}>
-                  {lang}
-                </option>
+              <option value="" disabled>Select a language</option>
+              {languages.map(lang => (
+                <option key={lang} value={lang}>{lang}</option>
               ))}
             </select>
           </div>
-
           <div>
             <label htmlFor="price" className="mb-2 block text-sm font-semibold text-gray-700 dark:text-gray-300">
               Price ($)
@@ -209,14 +204,14 @@ const Update = () => {
             onChange={handleChange}
             placeholder="Describe your teaching style..."
             required
-            className={inputClass + " resize-none"}
+            className={`${inputClass} resize-none`}
           ></textarea>
         </div>
 
         <div className="flex justify-center">
           <button
             type="submit"
-            className="inline-block rounded-lg bg-indigo-600 px-12 py-3 text-lg font-semibold text-white shadow-md transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="rounded-xl bg-indigo-600 px-14 py-3 text-lg font-semibold text-white shadow-lg transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-400"
           >
             Save Changes
           </button>

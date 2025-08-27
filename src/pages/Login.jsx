@@ -9,10 +9,10 @@ import {
   signInWithPopup,
 } from 'firebase/auth';
 import { useLocation, useNavigate, Link } from 'react-router-dom';
+import Lottie from 'lottie-react';
+import { Helmet } from 'react-helmet';
 import lottieLogin from '../assets/lotties/login.json';
 import app from '../firebase/firebase.config';
-import { Helmet } from 'react-helmet';
-import Lottie from 'lottie-react';
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
@@ -30,7 +30,6 @@ const Login = () => {
       const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
       const userEmail = userCredential.user.email;
 
-      // Fetch user from MongoDB
       const res = await fetch(`${import.meta.env.VITE_API_URL}/users?email=${userEmail}`);
       const mongoUser = await res.json();
 
@@ -52,7 +51,7 @@ const Login = () => {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
 
-      // Save or update user in MongoDB
+      // Save/update in MongoDB
       const userData = { name: user.displayName, email: user.email, role: "user" };
       await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
@@ -73,13 +72,13 @@ const Login = () => {
         <title>Login | EduBridge</title>
       </Helmet>
 
-      {/* Animation Section */}
+      {/* Lottie Animation */}
       <div className="w-full max-w-lg md:max-w-md mb-12 md:mb-0 md:mr-14">
         <Lottie animationData={lottieLogin} loop className="w-full h-auto select-none" />
       </div>
 
-      {/* Form Section */}
-      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-xl p-12 border border-gray-200 dark:border-gray-700">
+      {/* Login Form */}
+      <div className="w-full max-w-md bg-white dark:bg-gray-800 rounded-3xl shadow-2xl p-12 border border-gray-200 dark:border-gray-700">
         <h2 className="text-3xl font-extrabold mb-10 text-center text-gray-900 dark:text-gray-100 tracking-tight">
           Login to Your Account
         </h2>
@@ -95,8 +94,7 @@ const Login = () => {
               type="email"
               {...register('email', { required: 'Email is required' })}
               placeholder="you@example.com"
-              className={`w-full px-5 py-3 rounded-lg border
-                focus:outline-none focus:ring-3 focus:ring-lime-500
+              className={`w-full px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500
                 transition duration-300 text-gray-900 dark:text-gray-100
                 ${errors.email ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}`}
               aria-invalid={errors.email ? 'true' : 'false'}
@@ -118,8 +116,7 @@ const Login = () => {
                   minLength: { value: 6, message: 'Minimum 6 characters required' },
                 })}
                 placeholder="••••••••"
-                className={`w-full px-5 py-3 rounded-lg border
-                  focus:outline-none focus:ring-3 focus:ring-lime-500
+                className={`w-full px-5 py-3 rounded-lg border focus:outline-none focus:ring-3 focus:ring-lime-500
                   transition duration-300 text-gray-900 dark:text-gray-100
                   ${errors.password ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 dark:border-gray-600'}`}
                 aria-invalid={errors.password ? 'true' : 'false'}

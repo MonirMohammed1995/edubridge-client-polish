@@ -28,15 +28,21 @@ const Settings = () => {
   const handleSave = (e) => {
     e.preventDefault();
     // API call to update admin profile (optional)
-    Swal.fire("Saved!", "Settings updated successfully.", "success");
+    Swal.fire("✅ Saved!", "Settings updated successfully.", "success");
   };
 
-  return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-6">Admin Settings</h2>
+  const inputClass =
+    "w-full px-4 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors dark:bg-gray-800 dark:border-gray-600 dark:text-gray-200 dark:placeholder-gray-500";
 
-      <div className="max-w-3xl mx-auto bg-white dark:bg-gray-900 shadow-lg rounded-lg p-6">
-        <form onSubmit={handleSave} className="space-y-5">
+  return (
+    <main className="max-w-4xl mx-auto mt-12 mb-16 px-6 py-10 bg-white dark:bg-gray-900 rounded-3xl shadow-2xl transition-colors duration-300">
+      <h2 className="text-3xl font-extrabold mb-8 text-gray-900 dark:text-gray-100 text-center">
+        Admin Settings
+      </h2>
+
+      <div className="bg-gray-50 dark:bg-gray-800 p-8 rounded-2xl shadow-lg transition-colors duration-300">
+        <form onSubmit={handleSave} className="space-y-6">
+          {/* Name */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
               Name
@@ -46,10 +52,12 @@ const Settings = () => {
               name="name"
               value={profile.name}
               onChange={handleChange}
-              className="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-200"
+              placeholder="Enter your name"
+              className={inputClass}
             />
           </div>
 
+          {/* Email */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
               Email
@@ -59,10 +67,11 @@ const Settings = () => {
               name="email"
               value={profile.email}
               disabled
-              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 cursor-not-allowed"
+              className={`${inputClass} bg-gray-100 dark:bg-gray-700 cursor-not-allowed`}
             />
           </div>
 
+          {/* Role */}
           <div>
             <label className="block text-gray-700 dark:text-gray-300 font-semibold mb-2">
               Role
@@ -72,19 +81,22 @@ const Settings = () => {
               name="role"
               value={profile.role}
               disabled
-              className="w-full px-4 py-2 border rounded-lg bg-gray-100 dark:bg-gray-700 dark:text-gray-300 cursor-not-allowed"
+              className={`${inputClass} bg-gray-100 dark:bg-gray-700 cursor-not-allowed`}
             />
           </div>
 
-          <button
-            type="submit"
-            className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md transition"
-          >
-            Save Changes
-          </button>
+          {/* Save Button */}
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-semibold shadow-lg transition transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            >
+              Save Changes
+            </button>
+          </div>
         </form>
       </div>
-    </div>
+    </main>
   );
 };
 

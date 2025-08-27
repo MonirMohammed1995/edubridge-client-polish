@@ -4,6 +4,7 @@ import { AuthContext } from "../context/AuthProvider";
 import Swal from "sweetalert2";
 import { Helmet } from "react-helmet";
 import Loader from "../components/Loader";
+import { motion } from "framer-motion";
 
 const TutorDetails = () => {
   const { id } = useParams();
@@ -16,11 +17,10 @@ const TutorDetails = () => {
 
   const API = import.meta.env.VITE_API_URL;
 
-  // Nicely formatted price
   const formattedPrice = useMemo(() => {
     if (!tutor?.price && tutor?.price !== 0) return "—";
     const num = Number(tutor.price);
-    if (Number.isNaN(num)) return tutor.price; // fallback raw
+    if (Number.isNaN(num)) return tutor.price;
     try {
       return new Intl.NumberFormat(undefined, {
         style: "currency",
@@ -32,19 +32,14 @@ const TutorDetails = () => {
     }
   }, [tutor]);
 
-  // Safe tutor name (supports old docs with `name`)
   const tutorDisplayName = tutor?.tutorName || tutor?.name || "Tutor";
 
-  // Fetch tutor details
   useEffect(() => {
     const controller = new AbortController();
-
     const fetchTutor = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API}/tutors/${id}`, {
-          signal: controller.signal,
-        });
+        const res = await fetch(`${API}/tutors/${id}`, { signal: controller.signal });
         if (!res.ok) throw new Error("Tutor not found");
         const data = await res.json();
         setTutor(data);
@@ -56,21 +51,13 @@ const TutorDetails = () => {
         setLoading(false);
       }
     };
-
     fetchTutor();
     return () => controller.abort();
   }, [API, id]);
 
-  // Booking handler
   const handleBook = async () => {
-    if (!user) {
-      Swal.fire("⚠️ Please login first!", "", "warning");
-      return;
-    }
-    if (!tutor?._id) {
-      Swal.fire("❌ Error", "Tutor data is not loaded yet.", "error");
-      return;
-    }
+    if (!user) return Swal.fire("⚠️ Please login first!", "", "warning");
+    if (!tutor?._id) return Swal.fire("❌ Error", "Tutor data not loaded yet.", "error");
 
     const confirm = await Swal.fire({
       title: "Book this Tutor?",
@@ -87,8 +74,7 @@ const TutorDetails = () => {
     const bookingInfo = {
       tutorId: tutor._id,
       userEmail: user.email,
-      // ✅ Backend expects "date" (backend maps to bookedAt)
-      date: new Date().toISOString().split("T")[0], // YYYY-MM-DD
+      date: new Date().toISOString().split("T")[0],
     };
 
     try {
@@ -102,18 +88,13 @@ const TutorDetails = () => {
       const data = await res.json();
 
       if (res.ok && data?.success) {
-        Swal.fire({
-          title: "✅ Tutor Booked Successfully!",
-          icon: "success",
-          timer: 1800,
-          showConfirmButton: false,
-        });
+        Swal.fire({ title: "✅ Tutor Booked!", icon: "success", timer: 1800, showConfirmButton: false });
         navigate("/bookings");
       } else {
-        Swal.fire("❌ Booking Failed", data?.error || "Please try again.", "error");
+        Swal.fire("❌ Booking Failed", data?.error || "Try again.", "error");
       }
-    } catch (error) {
-      Swal.fire("❌ Error", "Something went wrong. Please try again.", "error");
+    } catch {
+      Swal.fire("❌ Error", "Something went wrong.", "error");
     } finally {
       setBooking(false);
     }
@@ -124,7 +105,7 @@ const TutorDetails = () => {
   if (!tutor)
     return (
       <section className="flex items-center justify-center py-28">
-        <p className="text-red-600 text-xl font-semibold tracking-wide select-none">
+        <p className="text-red-600 text-xl md:text-2xl font-semibold tracking-wide select-none">
           ❌ Tutor not found.
         </p>
       </section>
@@ -136,24 +117,26 @@ const TutorDetails = () => {
         <title>{tutorDisplayName} - Details</title>
       </Helmet>
 
-      <article className="grid grid-cols-1 md:grid-cols-2 gap-14 bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-indigo-300 dark:border-indigo-700 overflow-hidden">
-        {/* Image Section */}
+      <motion.article
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="grid grid-cols-1 md:grid-cols-2 gap-14 bg-white dark:bg-gray-900 rounded-3xl shadow-xl border border-indigo-300 dark:border-indigo-700 overflow-hidden"
+      >
+        {/* Image */}
         <div className="relative w-full h-96 md:h-auto rounded-t-3xl md:rounded-l-3xl overflow-hidden shadow-lg border border-gray-300 dark:border-gray-700">
           <img
             src={tutor.image}
             alt={tutorDisplayName}
             className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
-            onError={(e) => {
-              e.currentTarget.onerror = null;
-              e.currentTarget.src = "https://via.placeholder.com/600x600?text=No+Image";
-            }}
+            onError={(e) => (e.currentTarget.src = "https://via.placeholder.com/600x600?text=No+Image")}
           />
         </div>
 
-        {/* Content Section */}
+        {/* Content */}
         <div className="p-12 flex flex-col justify-between">
           <section>
-            <h1 className="text-5xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-8 tracking-tight drop-shadow-md select-text">
+            <h1 className="text-4xl md:text-5xl font-extrabold text-indigo-700 dark:text-indigo-300 mb-8 tracking-tight drop-shadow-md select-text">
               {tutorDisplayName}
             </h1>
 
@@ -163,10 +146,10 @@ const TutorDetails = () => {
               <DetailItem label="Reviews" value={tutor.review ?? 0} />
 
               <div>
-                <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4 select-text">
+                <h2 className="text-2xl md:text-3xl font-semibold text-gray-800 dark:text-gray-200 mb-4 select-text">
                   About the Tutor
                 </h2>
-                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line select-text">
+                <p className="text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-line select-text text-base md:text-lg">
                   {tutor.description || "No detailed description available."}
                 </p>
               </div>
@@ -183,17 +166,15 @@ const TutorDetails = () => {
             {booking ? "Booking..." : "Book This Tutor"}
           </button>
         </div>
-      </article>
+      </motion.article>
     </main>
   );
 };
 
 const DetailItem = ({ label, value }) => (
   <dl className="flex items-center gap-5">
-    <dt className="w-32 text-indigo-900 dark:text-indigo-300 font-semibold tracking-wide select-none">
-      {label}:
-    </dt>
-    <dd className="px-6 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 rounded-full text-base font-medium select-text">
+    <dt className="w-32 text-indigo-900 dark:text-indigo-300 font-semibold tracking-wide select-none text-base md:text-lg">{label}:</dt>
+    <dd className="px-6 py-2 bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-300 rounded-full text-base md:text-lg font-medium select-text">
       {value}
     </dd>
   </dl>
