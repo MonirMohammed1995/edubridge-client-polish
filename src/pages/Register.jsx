@@ -17,7 +17,7 @@ import {
 
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
-const VITE_API_URL = "http://localhost:3000"; // Replace with your backend
+
 
 const Register = () => {
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const Register = () => {
       await updateProfile(userCredential.user, { displayName: name, photoURL: photo });
 
       // Save user in MongoDB
-      const res = await fetch(`${VITE_API_URL}/users`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, role: "user" }),
@@ -67,7 +67,7 @@ const Register = () => {
     try {
       const result = await signInWithPopup(auth, provider);
       const user = result.user;
-      await fetch(`${VITE_API_URL}/users`, {
+      await fetch(`${import.meta.env.VITE_API_URL}/users`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name: user.displayName, email: user.email, role: "user" }),
